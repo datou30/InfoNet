@@ -14,7 +14,7 @@ If you have a pretrained InfoNet model and wish to fine-tune it on a new dataset
 
 ### Estimating Mutual Information
 
-For applications involving mutual information estimation using InfoNet, the `infer.py` script is designed to facilitate this process. It allows you to estimate mutual information values based on your trained model and input data. Pre-trained checkpoint can be found in: [Download Checkpoint]([https://your-google-drive-link.com](https://drive.google.com/file/d/1AalM-qoUYsJ5SS38hznXHSIv5h8lKVDx/view?usp=sharing))
+For applications involving mutual information estimation using InfoNet, the `infer.py` script is designed to facilitate this process. It allows you to estimate mutual information values based on your trained model and input data. Pre-trained checkpoint can be found in: [Download Checkpoint](https://drive.google.com/file/d/1AalM-qoUYsJ5SS38hznXHSIv5h8lKVDx/view?usp=sharing)
 
 ## Requirements
 
