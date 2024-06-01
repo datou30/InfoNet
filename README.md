@@ -30,7 +30,7 @@ pip install -r requirements.txt
 
 ### Training InfoNet from Scratch
 
-To train the model from scratch or finetune on specific distributions, `train.py` provides an example. This script will guide you through the process of initializing and training your model using the default Gaussian mixture distribution dataset.
+To train the model from scratch or finetune on specific distributions, `train.py` provides an example. This script will guide you through the process of initializing and training your model using the default Gaussian mixture distribution dataset. It will take about 4 hours to get convergence on 2 RTX 4090 GPU.
 
 ### Estimating Mutual Information
 
