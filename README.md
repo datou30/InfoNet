@@ -30,20 +30,23 @@ pip install -r requirements.txt
 
 ### Training InfoNet from Scratch
 
-To train an InfoNet model from scratch, you can use the `train.py` script. This script will guide you through the process of initializing and training your model using the default Gaussian mixture dataset.
+To train the model from scratch or finetune on specific distributions, `train.py` provides an example. This script will guide you through the process of initializing and training your model using the default Gaussian mixture distribution dataset.
 
 ### Estimating Mutual Information
 
-For applications involving mutual information estimation using InfoNet, the `infer.py` script provides several examples. Pre-trained checkpoint can be found in: [Download Checkpoint](https://drive.google.com/file/d/1AalM-qoUYsJ5SS38hznXHSIv5h8lKVDx/view?usp=sharing)
+When doing inference, estimating mutual information estimation using InfoNet, you can follow examples from `infer.py`. 
+Note that inputs should have shape [batchsize, sequence length, 2]. InfoNet is capable of estimating MI between multiple pairs at one time. 
+However, current version of InfoNet could only estimate direct MI between two 1-dimensional variables.
+For high dimensional correlation estimation, we apply [Sliced Mutual Information](https://arxiv.org/abs/2110.05279) instead, this retains the structural properties of classic MI while offering scalable computation, efficient high-dimensional estimation, and enhanced feature extraction capabilities.
+
+Pre-trained checkpoint can be found in: [Download Checkpoint](https://drive.google.com/drive/folders/1R7ah_ymD3M9Fp9EegyJrWNo5hI6Z5gZ7?usp=drive_link)
 
 ### Data Preprocessing
 
-Data preprocessing is crucial in the estimation result of InfoNet. In order to get the correct result, you need to apply copula transformation(rankdata) before pushing the data into the network.
-Also, rankdata will lead to undifferentiable, if you want to apply InfoNet in the training task, you will need to use [differentiable rank](https://arxiv.org/abs/2002.08871).
+Data preprocessing is crucial in the estimation result of InfoNet. In order to get the correct result, you need to apply copula transformation(rankdata) on each dimension before pushing the data into the network.
+Also, rankdata will lead to undifferentiable, if you want to apply InfoNet in the training task, you can utilize differentiable rank techniques such as [Fast Differentiable Sorting and Ranking](https://arxiv.org/abs/2002.08871).
 
-For high-dimensional estimation using sliced mutual information, we have find first applying a linear mapping on each dimension separately (e.g. map all the dimensions between -1 and 1) before doing random slices will increase the performance.
-
-## Method Discription
+For high-dimensional estimation using sliced mutual information, we have found first applying a linear mapping on each dimension separately (e.g. map all the dimensions between -1 and 1) before doing random projections will increase the performance.
 
 ## Citing Our Work
 
