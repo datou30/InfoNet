@@ -1,40 +1,68 @@
+import torch
+import yaml
 import matplotlib.pyplot as plt
 import numpy as np
-import torch
 from model.decoder import Decoder
 from model.encoder import Encoder
 from model.infonet import infonet
 from model.query import Query_Gen_transformer
 from scipy.stats import rankdata
 
-latent_dim = 256
-latent_num = 256
-input_dim = 2
-decoder_query_dim = 1000
+global device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-encoder = Encoder(
-    input_dim=input_dim,
-    latent_num=latent_num,
-    latent_dim=latent_dim,
-    cross_attn_heads=8,
-    self_attn_heads=16,
-    num_self_attn_per_block=8,
-    num_self_attn_blocks=1
-)
+def load_config(config_path):
+    with open(config_path, 'r') as file:
+        config = yaml.safe_load(file)
+    return config
 
-decoder = Decoder(
-    q_dim=decoder_query_dim,
-    latent_dim=latent_dim,
-)
+def create_model(config):
+    encoder = Encoder(
+        input_dim=config['model']['input_dim'],
+        latent_num=config['model']['latent_num'],
+        latent_dim=config['model']['latent_dim'],
+        cross_attn_heads=config['model']['cross_attn_heads'],
+        self_attn_heads=config['model']['self_attn_heads'],
+        num_self_attn_per_block=config['model']['num_self_attn_per_block'],
+        num_self_attn_blocks=config['model']['num_self_attn_blocks']
+    )
 
-query_gen = Query_Gen_transformer(
-    input_dim = input_dim,
-    dim = decoder_query_dim
-)
+    decoder = Decoder(
+        q_dim=config['model']['decoder_query_dim'],
+        latent_dim=config['model']['latent_dim'],
+    )
 
-model = infonet(encoder=encoder, decoder=decoder, query_gen = query_gen, decoder_query_dim = decoder_query_dim).to(device)
-model.load_state_dict(torch.load('saved/uniform/model_5000_32_1000-720--0.16.pt', map_location=device))
+    query_gen = Query_Gen_transformer(
+        input_dim=config['model']['input_dim'],
+        dim=config['model']['decoder_query_dim']
+    )
+    
+    model = infonet(
+        encoder=encoder,
+        decoder=decoder,
+        query_gen=query_gen,
+        decoder_query_dim=config['model']['decoder_query_dim']
+    ).to(device)
+    
+    return model
+
+def load_model(config_path, checkpoint_path):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    config = load_config(config_path)
+    model = create_model(config)
+    model.load_state_dict(torch.load(checkpoint_path, map_location=device))
+    model.eval()
+    return model
+
+def estimate_mi(model, x, y):
+    ## x and y are 1 dimensional sequences
+    model.eval()
+    x = rankdata(x)/len(x)
+    y = rankdata(y)/len(y)
+    batch = torch.stack((torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)), dim=1).unsqueeze(0).to(device) ## batch has shape [1, sequence length, 2]
+    with torch.no_grad():
+        mi_lb = model(batch)
+    return mi_lb
 
 def infer(model, batch):
     ### batch has shape [batchsize, seq_len, 2]
@@ -81,25 +109,11 @@ def example_d_1():
         x, y = np.random.multivariate_normal(mean=[0,0], cov=[[1,rou],[rou,1]], size=seq_len).T
         x = rankdata(x)/seq_len #### important, data preprocessing is needed, using rankdata(x)/seq_len to map x and y to [0,1]
         y = rankdata(y)/seq_len
-        xy = np.column_stack((x, y))
-        result = infer(model, xy.reshape(1, seq_len, 2))
+        result = estimate_mi(model, x, y).squeeze().cpu().numpy()
         real_MI = -np.log(1-rou**2)/2
         real_MIs.append(real_MI)
         results.append(result)
         print("estimate mutual information is: ", result, "real MI is ", real_MI  )
-
-    plt.style.use("ggplot")
-    fig = plt.figure(figsize=(10,10))
-
-    ax1 = fig.add_subplot(111)
-        
-    ax1.plot(np.arange(-0.9, 1, 0.1), np.array(real_MIs), color="red", lw=2, ls="-", label="real mutual information",  markersize=10)
-    ax1.plot(np.arange(-0.9, 1, 0.1), np.array(results), color="blue", lw=2, ls="-", label="estimate MI",   markersize=10)
-    ax1.set_xlabel("# rou", fontweight="bold", fontsize=20)
-    ax1.set_ylabel(" mutual information ", fontweight="bold", fontsize=20)
-    ax1.legend(fontsize=20, loc="upper left")
-
-    plt.savefig(f"./plots/gauss_result.png")
 
 def example_highd():
     d = 10
@@ -108,12 +122,18 @@ def example_highd():
     sample_x = np.random.multivariate_normal(mu, sigma, 2000)
     sample_y = np.random.multivariate_normal(mu, sigma, 2000)
     result = compute_smi_mean(sample_x, sample_y, model, seq_len=2000, proj_num=1024, batchsize=32)
-    print(result)
+    print(f"result is {result}")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='Load model from config and checkpoint')
+    parser.add_argument('--config', type=str, required=False, default='configs/config.yaml', help='Path to the config file')
+    parser.add_argument('--checkpoint', type=str, required=False, default="saved/uniform/model_5000_32_1000-720--0.16.pt", help='Path to the model checkpoint')
+    
+    args = parser.parse_args()
+    
+    model = load_model(args.config, args.checkpoint)
+    print("Model loaded successfully")
 
-    ### infonet directly predict MI between 1-dimensional variables
-    ### we apply sliced mutual information for high dimension
     example_d_1()
     #example_highd()
-    
