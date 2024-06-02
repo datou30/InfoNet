@@ -79,10 +79,26 @@ To train the model from scratch or finetune on specific distributions, `train.py
 
 ### Data Preprocessing
 
-Data preprocessing is crucial in the estimation result of InfoNet. In order to get the correct result, you need to apply copula transformation(rankdata) on each dimension before pushing the data into the network.
-Also, rankdata will lead to undifferentiable, if you want to apply InfoNet in the training task, you can utilize differentiable rank techniques such as [Fast Differentiable Sorting and Ranking](https://arxiv.org/abs/2002.08871).
+Data preprocessing is crucial in the estimation result of InfoNet. You should make sure to use the same data preprocessing method in the training and testing (e.g. using copula transformation or linear scaling).
+```python 
+from scipy.stats import rankdata
+x = rankdata(x)/seq_len
+y = rankdata(y)/seq_len
+```
+Also, `rankdata` will lead to undifferentiable, if you want to apply InfoNet in the training task, you can replace `rankdata` with differentiable rank techniques such as [Fast Differentiable Sorting and Ranking](https://arxiv.org/abs/2002.08871). 
 
 For high-dimensional estimation using sliced mutual information, we have found first applying a linear mapping on each dimension separately (e.g. map all the dimensions between -1 and 1) before doing random projections will increase the performance.
+
+```python 
+## linear scale [batchsize, seq_len, dim] to [-1,1] on seq_len
+min_val = torch.min(input_tensor, dim=1, keepdim=True).values
+max_val = torch.max(input_tensor, dim=1, keepdim=True).values
+scaled_tensor = 2 * (input_tensor - min_val) / (max_val - min_val) - 1
+```
+
+### Experiments 
+
+Experiments can be found in `Notebooks`, we provide two .ipynb files to reproduce our experimental results detailedly.
 
 ## Citing Our Work
 
