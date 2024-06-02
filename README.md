@@ -28,18 +28,54 @@ This is a requirement list, ensure you have all the necessary dependencies insta
 pip install -r requirements.txt
 ```
 
+### Estimating Mutual Information
+
+When doing inference, estimating mutual information estimation using InfoNet, you can follow examples below or refer to `infer.py` for additional instruction.
+
+when x and y are scalable random variables:
+```python 
+import numpy as np
+import torch
+from scipy.stats import rankdata
+from infer import load_model, estimate_mi, compute_smi_mean
+
+config_path = "configs/config.yaml"
+ckpt_path = "saved/uniform/model_5000_32_1000-720--0.16.pt"
+model = load_model(config_path, ckpt_path)
+
+## random generate gauss distribution examples
+seq_len = 4781
+rou = 0.5
+x, y = np.random.multivariate_normal(mean=[0,0], cov=[[1,rou],[rou,1]], size=seq_len).T
+
+## data preprocessing and estimating
+x = rankdata(x)/seq_len
+y = rankdata(y)/seq_len
+result = estimate_mi(model, x, y).squeeze().cpu().numpy()
+real_MI = -np.log(1-rou**2)/2
+print("estimate mutual information is: ", result, "real MI is ", real_MI)
+```
+
+If x and y are high-dimensional variables, we apply [Sliced Mutual Information](https://arxiv.org/abs/2110.05279) instead:
+
+```python 
+d = 10
+mu = np.zeros(d)
+sigma = np.eye(d)
+sample_x = np.random.multivariate_normal(mu, sigma, 2000)
+sample_y = np.random.multivariate_normal(mu, sigma, 2000)
+result = compute_smi_mean(sample_x, sample_y, model, seq_len=2000, proj_num=1024, batchsize=32)
+## proj_num means the number of random projections you want to use, the larger the more accuracy but higher time cost
+## seq_len means the number of samples used for the estimation
+## batchsize means the number of one-dimensional pairs estimate at one time, this only influences the estimation speed
+```
+
+Note that inputs should have shape [batchsize, sequence length, 2]. InfoNet is capable of estimating MI between multiple pairs at one time. 
+Pre-trained checkpoint can be found in: [Download Checkpoint](https://drive.google.com/drive/folders/1R7ah_ymD3M9Fp9EegyJrWNo5hI6Z5gZ7?usp=drive_link)
+
 ### Training InfoNet from Scratch
 
 To train the model from scratch or finetune on specific distributions, `train.py` provides an example. This script will guide you through the process of initializing and training your model using the default Gaussian mixture distribution dataset. It will take about 4 hours to get convergence on 2 RTX 4090 GPU.
-
-### Estimating Mutual Information
-
-When doing inference, estimating mutual information estimation using InfoNet, you can follow examples from `infer.py`. 
-Note that inputs should have shape [batchsize, sequence length, 2]. InfoNet is capable of estimating MI between multiple pairs at one time. 
-However, current version of InfoNet could only estimate direct MI between two 1-dimensional variables.
-For high dimensional correlation estimation, we apply [Sliced Mutual Information](https://arxiv.org/abs/2110.05279) instead, this retains the structural properties of classic MI while offering scalable computation, efficient high-dimensional estimation, and enhanced feature extraction capabilities.
-
-Pre-trained checkpoint can be found in: [Download Checkpoint](https://drive.google.com/drive/folders/1R7ah_ymD3M9Fp9EegyJrWNo5hI6Z5gZ7?usp=drive_link)
 
 ### Data Preprocessing
 
