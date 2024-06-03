@@ -100,6 +100,10 @@ scaled_tensor = 2 * (input_tensor - min_val) / (max_val - min_val) - 1
 
 Experiments can be found in `Notebooks`, we provide two .ipynb files to reproduce our experimental results detailedly.
 
+### Acknowledgement
+
+We would like to express our gratitude to [esceptico/perceiver-io](https://github.com/esceptico/perceiver-io) for providing the code base that significantly assisted in the development of our program.
+
 ## Citing Our Work
 
 If you find our work interesting and useful, please consider citing our paper:
