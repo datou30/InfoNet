@@ -12,9 +12,9 @@ You can utilize it to compute mutual information between two sequences quickly!
 
 ## Method overview
 
-Mutual information (MI) is a valuable metric for assessing the similarity between two variables and has lots of applications in deep learning. However, current neural MI estimation methods such as [MINE](https://arxiv.org/abs/1801.04062) are a bit time-costly (needs over 1 minute to get the estimation between pairs of data). Our work is to extremely make the process much faster. 
+Mutual information (MI) is a valuable metric for assessing the similarity between two variables and has lots of applications in deep learning. However, current neural MI estimation methods such as [MINE](https://arxiv.org/abs/1801.04062) are a bit time-costly (needs over 1 minute to get the estimation between pairs of data). Our work is to utilize a neural method to make the process much faster. 
 
-To overcome this, our method trains a pre-trained model InfoNet using various synthetic distributions. Unlike MINE requires training an MLP from scratch separately for every pair of data when estimating MI, our model only needs one feed-forward process to get the estimation. Experiments have shown our method has strong generalization ability on unseen distributions.
+In order to achieve this, our method designs a network structure and trains a pre-trained model InfoNet using various synthetic distributions, it can remember various information from a large amount of distributions. Unlike MINE, which requires training an MLP from scratch separately for every pair of data when estimating MI, our model only needs to do one forward pass to get the estimation. Experiments have shown our method has strong generalization ability on unseen distributions.
 
 <p align="center">
   <img src="https://drive.google.com/uc?export=view&id=1aJ-WDgvQRoCTBp7HLsMEOCIKhZG_lm-1" alt="infonet_logo" width="300"/>
