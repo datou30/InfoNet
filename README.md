@@ -8,6 +8,8 @@ Welcome to InfoNet 😀! This is a PyTorch implementation of the article [InfoNe
 Our project page can be found [here](https://datou30.github.io/InfoNet-page/).
 You can utilize it to compute mutual information between two sequences quickly!
 
+(This project is currently under active development. We are continuously working on perfecting this repo and the project page.✨)
+
 ## Method overview
 
 Mutual information (MI) is a valuable metric for assessing the similarity between two variables and has lots of applications in deep learning. However, current neural MI estimation methods such as [MINE](https://arxiv.org/abs/1801.04062) are a bit time-costly (needs over 1 minute to get the estimation between pairs of data). Our work is to extremely make the process much faster. 
