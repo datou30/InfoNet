@@ -1,4 +1,4 @@
-# InfoNet PyTorch Implementation
+# InfoNet PyTorch
 
 <p align="center">
   <img src="https://drive.google.com/uc?export=view&id=1CS-iVGgRriB3Erl4fn8fLUJOjf6BHNqd" alt="infonet_logo" width="280"/>
