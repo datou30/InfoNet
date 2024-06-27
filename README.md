@@ -1,10 +1,10 @@
-# InfoNet PyTorch
+# InfoNet: Neural Estimation of Mutual Information without Test-Time Optimization
 
 <p align="center">
   <img src="https://drive.google.com/uc?export=view&id=1CS-iVGgRriB3Erl4fn8fLUJOjf6BHNqd" alt="infonet_logo" width="280"/>
 </p>
 
-Welcome to InfoNet 😀! This is a PyTorch implementation of the article [InfoNet: Neural Estimation of Mutual Information without Test-Time Optimization](https://arxiv.org/abs/2402.10158).
+Welcome to InfoNet 😀! This is a PyTorch implementation of our paper [InfoNet: Neural Estimation of Mutual Information without Test-Time Optimization](https://arxiv.org/abs/2402.10158).
 Our project page can be found [here](https://datou30.github.io/InfoNet-page/).
 You can utilize it to compute mutual information between two sequences quickly!
 
