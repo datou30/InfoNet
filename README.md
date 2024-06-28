@@ -87,7 +87,15 @@ from scipy.stats import rankdata
 x = rankdata(x)/seq_len
 y = rankdata(y)/seq_len
 ```
-Also, `rankdata` will lead to undifferentiable, if you want to apply InfoNet in the training task, you can replace `rankdata` with differentiable rank techniques such as [Fast Differentiable Sorting and Ranking](https://arxiv.org/abs/2002.08871). 
+Also, `rankdata` will lead to undifferentiable, if you want to apply InfoNet in the training task, you can replace `rankdata` with differentiable rank techniques： [Fast Differentiable Sorting and Ranking](https://arxiv.org/abs/2002.08871), [github repo link here](https://github.com/teddykoker/torchsort). 
+
+```python 
+pip install torchsort
+
+x, y = np.random.multivariate_normal(mean=[0,0], cov=[[1,0.5],[0.5,1]], size=5000).T
+x = torchsort.soft_rank(torch.from_numpy(x).unsqueeze(0), regularization_strength=1e-3)/5000
+y = torchsort.soft_rank(torch.from_numpy(y).unsqueeze(0), regularization_strength=1e-3)/5000
+```
 
 For high-dimensional estimation using sliced mutual information, we have found first applying a linear mapping on each dimension separately (e.g. map all the dimensions between -1 and 1) before doing random projections will increase the performance.
 
