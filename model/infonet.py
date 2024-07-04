@@ -7,44 +7,10 @@ from .encoder import Encoder
 from .decoder import Decoder
 from .query import Query_Gen_transformer
 from .gauss_mild import GaussConv
+from .util import mutual_information
 import torch.nn.functional as F
 import numpy as np
 #from .query import Query_Gen
-
-def lookup_value_grid(matrix, vector, mode):
-    
-    batchsize = matrix.shape[0]
-    dim = matrix.shape[1]
-    num = vector.shape[1]
-    matrix = matrix.view(batchsize, 1, dim, dim)
-    vector = vector.view(batchsize, num, 1, 2)
-    value = (F.grid_sample(matrix, vector, mode, padding_mode='border', align_corners=True)).squeeze()
-    return value   
-
-def mutual_information(batch, matrix):
-    ## batch is only joint
-    
-    
-    t = lookup_value_grid(matrix, batch, "bilinear")
-    t = torch.clamp(t, min=-200, max=200)
-    et = torch.zeros(t.shape).cuda()
-    #print('===================> t range is:', torch.max(t), torch.min(t) ,'\n')
-    for i in range(20):
-        perm = torch.randperm(batch.shape[1])
-        marginal = torch.cat((batch[:, :, 0].unsqueeze(2), batch[:, perm, 1].unsqueeze(2)), dim=2)
-        et += torch.exp(torch.clamp(lookup_value_grid(matrix, marginal, "bilinear"), min=-100, max=100))
-    
-    et = et/20
-    #print(et.shape)
-    
-    #t_m = lookup_value_grid(matrix, marginal, "bilinear")
-    if len(t.shape)==1:
-        t = t.unsqueeze(0)
-        et = et.unsqueeze(0)
-    mi_lb = torch.mean(t, dim=1) - torch.log(torch.mean(et, dim=1))
-    if torch.isnan(- torch.mean(mi_lb) ):
-        raise ValueError("Loss is NaN!")
-    return mi_lb
 
 class infonet(nn.Module):
 
@@ -89,5 +55,4 @@ class infonet(nn.Module):
         #print("saved!!!!!!!!!!!!!!!1")
         mi_lb = mutual_information(inputs, outputs)
 
-        
         return mi_lb
