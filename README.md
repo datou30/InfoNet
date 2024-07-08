@@ -107,11 +107,16 @@ scaled_tensor = 2 * (input_tensor - min_val) / (max_val - min_val) - 1
 ```
 ### Evaluation Dataset
 
-In `gmm_eval_dataset`, we have provided a series of parameters for Gaussian Mixture Models along with the ground truth mutual information between X and Y. They are categorized according to the number of Gaussian components, each with 5000 random generated distributions.
+In `gmm_eval_dataset`, we have provided a series of parameters for Gaussian Mixture Models along with the ground truth mutual information between X and Y. They are categorized according to the number of Gaussian components, each with 5000 randomly generated distributions.
 
 ### Experiments 
 
-Experiments can be found in `Notebooks`, we provide two .ipynb files to reproduce our experimental results detailedly.
+Experiments can be found in `Notebooks`, we provide four .ipynb files to reproduce our experimental results detailedly.
+
+- `estimate_gmm.ipynb` provides the evaluation results of InfoNet on Mixture of Gaussian distributions, along with the order accuracy.
+- `estimate_pointodyssey_track.ipynb` provides the reproduction results of InfoNet on PointOdyssey dataset.
+- `estimate_gmm.ipynb` provides InfoNet results on several completely unseen distributions.
+- `independence_test.ipynb` provides high-dimensional independence testing results of InfoNet on three different correlations.
 
 ### Acknowledgement
 
