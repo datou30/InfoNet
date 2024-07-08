@@ -115,7 +115,7 @@ Experiments can be found in `Notebooks`, we provide four .ipynb files to reprodu
 
 - `estimate_gmm.ipynb` provides the evaluation results of InfoNet on Mixture of Gaussian distributions, along with the order accuracy.
 - `estimate_pointodyssey_track.ipynb` provides the reproduction results of InfoNet on PointOdyssey dataset.
-- `estimate_gmm.ipynb` provides InfoNet results on several completely unseen distributions.
+- `evaluation_on_other_distributions.ipynb` provides InfoNet results on several completely unseen distributions.
 - `independence_test.ipynb` provides high-dimensional independence testing results of InfoNet on three different correlations.
 
 ### Acknowledgement
