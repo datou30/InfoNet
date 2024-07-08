@@ -88,7 +88,7 @@ x = rankdata(x)/seq_len
 y = rankdata(y)/seq_len
 ```
 Also, `rankdata` will lead to undifferentiable, if you want to apply InfoNet in the training task, you can replace `rankdata` with differentiable rank techniques： [Fast Differentiable Sorting and Ranking](https://arxiv.org/abs/2002.08871), [github repo link here](https://github.com/teddykoker/torchsort). 
-
+Detailed instruction of softrank will be shown in the new branch softrank.
 ```python 
 pip install torchsort
 
@@ -105,6 +105,9 @@ min_val = torch.min(input_tensor, dim=1, keepdim=True).values
 max_val = torch.max(input_tensor, dim=1, keepdim=True).values
 scaled_tensor = 2 * (input_tensor - min_val) / (max_val - min_val) - 1
 ```
+### Evaluation Dataset
+
+In `gmm_eval_dataset`, we have provided a series of parameters for Gaussian Mixture Models along with the ground truth mutual information between X and Y. They are categorized according to the number of Gaussian components, each with 5000 random generated distributions.
 
 ### Experiments 
 
