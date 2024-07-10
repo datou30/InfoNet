@@ -50,7 +50,7 @@ seq_len = 4781
 rou = 0.5
 x, y = np.random.multivariate_normal(mean=[0,0], cov=[[1,rou],[rou,1]], size=seq_len).T
 
-## data preprocessing and estimating
+## data preprocessing and estimating, for more detail please see the instruction in Data Preprocessing section
 x = rankdata(x)/seq_len
 y = rankdata(y)/seq_len
 result = estimate_mi(model, x, y).squeeze().cpu().numpy()
@@ -81,21 +81,21 @@ To train the model from scratch or finetune on specific distributions, `train.py
 
 ### Data Preprocessing
 
-Data preprocessing is crucial in the estimation result of InfoNet. You should make sure to use the same data preprocessing method in the training and testing (e.g. using copula transformation or linear scaling).
+Data preprocessing is crucial in the estimation result of InfoNet. You should make sure to use the same data preprocessing method in the training and testing (e.g. using same copula transformation, softrank, or linear scaling).
 ```python 
 from scipy.stats import rankdata
 x = rankdata(x)/seq_len
 y = rankdata(y)/seq_len
 ```
-Also, `rankdata` will lead to undifferentiable, if you want to apply InfoNet in the training task, you can replace `rankdata` with differentiable rank techniques： [Fast Differentiable Sorting and Ranking](https://arxiv.org/abs/2002.08871), [github repo link here](https://github.com/teddykoker/torchsort). 
-Detailed instruction of softrank will be shown in the new branch softrank.
+If you want to apply InfoNet in the training task, please go to **softrank** branch since **rankdata** may lead to undifferentiable. You can replace rankdata with  soft rank： [Fast Differentiable Sorting and Ranking](https://arxiv.org/abs/2002.08871), [github repo](https://github.com/teddykoker/torchsort). An example of soft rank is shown below:
+
 ```python 
 pip install torchsort
-
 x, y = np.random.multivariate_normal(mean=[0,0], cov=[[1,0.5],[0.5,1]], size=5000).T
 x = torchsort.soft_rank(torch.from_numpy(x).unsqueeze(0), regularization_strength=1e-3)/5000
 y = torchsort.soft_rank(torch.from_numpy(y).unsqueeze(0), regularization_strength=1e-3)/5000
 ```
+If you set `regularization_strength` sufficiently small (such as 1e-3), softrank result will be just the same as rankdata. However, setting it too small may lead to gradient explosion. Thus, we fix the `regularization_strength` to 0.1 and training a new checkpoint, detailed instruction can be found in **softrank** branch.
 
 For high-dimensional estimation using sliced mutual information, we have found first applying a linear mapping on each dimension separately (e.g. map all the dimensions between -1 and 1) before doing random projections will increase the performance.
 
@@ -107,7 +107,7 @@ scaled_tensor = 2 * (input_tensor - min_val) / (max_val - min_val) - 1
 ```
 ### Evaluation Dataset
 
-In `gmm_eval_dataset`, we have provided a series of parameters for Gaussian Mixture Models along with the ground truth mutual information between X and Y. They are categorized according to the number of Gaussian components, each with 5000 randomly generated distributions.
+In `gmm_eval_dataset`, we have provided a series of parameters for Gaussian Mixture Models along with the ground truth mutual information between X and Y. They are categorized according to the number of Gaussian components, each with 5000 randomly generated distributions. In `Notebooks/estimate_gmm.ipynb` you can find examples to use this dataset.
 
 ### Experiments 
 
