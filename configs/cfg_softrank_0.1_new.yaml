@@ -1,0 +1,27 @@
+defaults:
+  - override hydra/launcher: joblib
+
+latent_dim: 512
+latent_num: 512
+input_dim: 2
+decoder_query_dim: 1000
+batchsize: 10
+seq_len: 5000
+device: [0,1,2,3]
+reg: 0.1
+name: infonet-gmm-softrank
+version: reg=0.1-weighted
+
+hydra:
+  run:
+    dir: './'
+  sweep:
+    dir: './'
+    subdir: ''
+  sweeper:
+    params:
+      input_dim: 1
+
+  launcher:
+    n_jobs: 1
+    
