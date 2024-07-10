@@ -138,7 +138,7 @@ def compare(list_a, list_b):
 def gmm_order_eval(module, dim, iter, seq_len=2000, number_test=500, reg=0.1):
     
     module.eval()
-    path = "/home/hzy/work/kNN/InfoNet-main-V2/num_compare"
+    path = "gmm_eval_dataset"
 
     full_path = os.path.join(path, f'num_{dim}')
     MI_XY = []
