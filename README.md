@@ -1,14 +1,7 @@
 # InfoNet: Neural Estimation of Mutual Information without Test-Time Optimization
 
-<p align="center">
-  <img src="https://drive.google.com/uc?export=view&id=1CS-iVGgRriB3Erl4fn8fLUJOjf6BHNqd" alt="infonet_logo" width="280"/>
-</p>
-
-Welcome to InfoNet 😀! This is a PyTorch implementation of our paper [InfoNet: Neural Estimation of Mutual Information without Test-Time Optimization](https://arxiv.org/abs/2402.10158).
-Our project page can be found [here](https://datou30.github.io/InfoNet-page/).
-You can utilize it to compute mutual information between two sequences quickly!
-
-(This project is currently under active development. We are continuously working on perfecting this repo and the project page.✨)
+Welcome to InfoNet 😀! This branch is a pytorch implementation of our paper [InfoNet: Neural Estimation of Mutual Information without Test-Time Optimization](https://arxiv.org/abs/2402.10158).
+We replace the hard rank preprocessing with softrank and provide corresponding checkpoints here.
 
 ## Getting Started
 
@@ -64,14 +57,19 @@ To train the model from scratch or finetune on specific distributions, `train_so
 
 ### Brief Introduction of Soft Rank
 
-For high-dimensional estimation using sliced mutual information, we have found first applying a linear mapping on each dimension separately (e.g. map all the dimensions between -1 and 1) before doing random projections will increase the performance.
+SoftRank provides a smooth approximation of traditional rank functions. It has a regularization parameter controls the smoothness of the ranking function: smaller values make it closer to the original rank, while larger values make it smoother. We utilize the method proposed in [Fast Differentiable Sorting and Ranking](https://arxiv.org/abs/2002.08871), github repo can be found [here](https://github.com/teddykoker/torchsort).
 
 ```python 
-## linear scale [batchsize, seq_len, dim] to [-1,1] on seq_len
-min_val = torch.min(input_tensor, dim=1, keepdim=True).values
-max_val = torch.max(input_tensor, dim=1, keepdim=True).values
-scaled_tensor = 2 * (input_tensor - min_val) / (max_val - min_val) - 1
+pip install torchsort
+x, y = np.random.multivariate_normal(mean=[0,0], cov=[[1,0.5],[0.5,1]], size=5000).T
+x = torchsort.soft_rank(torch.from_numpy(x).unsqueeze(0), regularization_strength=1e-3)
 ```
+
+<p align="center">
+  <img src="https://drive.google.com/uc?id=1hXAl9qpjw9nO_H8SfuYvEcwkVPw8m-Gx" alt="softrank" width="280"/>
+</p>
+
+
 
 ## Citing Our Work
 
